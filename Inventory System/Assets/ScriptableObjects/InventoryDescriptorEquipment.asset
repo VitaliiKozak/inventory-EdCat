@@ -10,17 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 57a78a7572f94cd44860bc0d62eaaa01, type: 3}
-  m_Name: InventoryDescriptorPlayer
+  m_Name: InventoryDescriptorEquipment
   m_EditorClassIdentifier: 
-  Type: 1
-  BaseAvailableSlots: 5
+  Type: 3
+  BaseAvailableSlots: 8
   SlotsToInit:
   - AditionalIndex: 0
     Count: 1
-    Tags: 256
+    Tags: 2
   - AditionalIndex: 0
     Count: 1
-    Tags: 512
+    Tags: 4
   - AditionalIndex: 0
-    Count: 22
-    Tags: 64
+    Count: 1
+    Tags: 8
+  - AditionalIndex: 0
+    Count: 1
+    Tags: 16
+  - AditionalIndex: 0
+    Count: 1
+    Tags: 32
+  - AditionalIndex: 0
+    Count: 1
+    Tags: 128

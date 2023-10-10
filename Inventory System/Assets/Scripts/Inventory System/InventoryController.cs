@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace InventorySystem
 {
+    [System.Serializable]
     public class InventoryController
     {
         public InventoryType Type => _inventoryDescriptor.Type;
@@ -28,6 +29,7 @@ namespace InventorySystem
                 for (int i = 0; i < slotInitData.Count; i++)
                 {
                     _inventory.AddSlot(new Slot(index +slotInitData.AditionalIndex, slotInitData.Tags));
+                    _inventory.Slots[^1].SetAvailable(index < _inventoryDescriptor.BaseAvailableSlots);
                     index++;
                 }
             }
@@ -39,6 +41,7 @@ namespace InventorySystem
         None,
         Player,
         Stock,
+        Equipment,
     }
 
     [System.Serializable]

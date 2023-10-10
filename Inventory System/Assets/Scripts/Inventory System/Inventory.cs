@@ -35,7 +35,7 @@ namespace InventorySystem
         {
             if (HasItem(itemName) == true)
             {
-                Slots.Find(x => x.Item.Name == itemName).Add(count);
+                Slots.Find(x =>x.IsFree == false &&  x.Item.Name == itemName).Add(count);
                 return ItemAddResult.Success;
             }
 
@@ -88,10 +88,12 @@ namespace InventorySystem
         
         public void DebugItems()
         {
+            var data = "Inventory:\n";
             for (int i = 0; i < Slots.Count; i++)
             {
-                Debug.LogError(Slots[i].ToString());
+                data+=Slots[i].ToString() + "\n";
             }
+            Debug.LogError(data);
         }
     }
 

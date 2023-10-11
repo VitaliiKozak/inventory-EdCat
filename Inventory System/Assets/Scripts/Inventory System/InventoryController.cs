@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -57,12 +58,30 @@ namespace InventorySystem
 
         public virtual MoveItemResult MoveItemTo(ItemName itemName, int slotId)
         {
-            return _inventory.MoveItemTo(itemName, slotId);
+            var result = _inventory.MoveItemTo(itemName, slotId);
+            if (result == MoveItemResult.SelectedSlotOccupied)
+            {
+                return SwapItemToOccupied(itemName, slotId);
+            }
+
+            return result;
         }
 
         public virtual SwapItemResult SwapItems(ItemName itemName, int slotId)
         {
             return _inventory.SwapItems(itemName, slotId);
+        }
+
+        private MoveItemResult SwapItemToOccupied(ItemName itemName, int slotId)
+        {
+            var result = SwapItems(itemName, slotId);
+            
+            if (result == SwapItemResult.Success)
+            {
+                return MoveItemResult.Success;
+            }
+
+            return MoveItemResult.SelectedSlotMissingTag;
         }
     }
 

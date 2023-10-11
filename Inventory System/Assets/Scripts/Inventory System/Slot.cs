@@ -7,6 +7,7 @@ namespace InventorySystem
 {
     public interface ISlotInfo
     {
+        int Id { get; }
         int Count { get; }
         bool IsFree { get; }
         bool IsAvailable { get; }

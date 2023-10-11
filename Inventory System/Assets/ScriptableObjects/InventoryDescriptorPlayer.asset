@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: InventoryDescriptorPlayer
   m_EditorClassIdentifier: 
   Type: 1
-  BaseAvailableSlots: 5
+  BaseAvailableSlots: 10
   SlotsToInit:
   - AditionalIndex: 0
     Count: 1

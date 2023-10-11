@@ -900,6 +900,14 @@ MonoBehaviour:
     <SlotsData>k__BackingField: 256
     <TagData>k__BackingField: 0
     <AffectDataList>k__BackingField: []
+  - <Name>k__BackingField: 6
+    <SlotsData>k__BackingField: 64
+    <TagData>k__BackingField: 0
+    <AffectDataList>k__BackingField: []
+  - <Name>k__BackingField: 7
+    <SlotsData>k__BackingField: 64
+    <TagData>k__BackingField: 0
+    <AffectDataList>k__BackingField: []
   _defaulteData:
     <Name>k__BackingField: 0
     <SlotsData>k__BackingField: 64
@@ -974,7 +982,8 @@ MonoBehaviour:
   _dragItemParent: {fileID: 1011340929}
   _cellParent: {fileID: 1507672047}
   _cellPrefab: {fileID: 757073931770405265, guid: ac6d73c2625825f4fbfea94e9fd01dfa, type: 3}
-  _cellCount: 5
+  _inventoryController: {fileID: 1491556023}
+  _undragedSlot: 768
 --- !u!222 &1628426037
 CanvasRenderer:
   m_ObjectHideFlags: 0

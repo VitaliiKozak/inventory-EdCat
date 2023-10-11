@@ -15,9 +15,11 @@ public class TestInventoryInteraction : MonoBehaviour
         SecondInventory.InventoryController.Inventory.DebugItems();
         
         var slot = FirstInventory.InventoryController.Inventory.Slots.Find(x => x.IsFree == false);
-        SecondInventory.InventoryController.Inventory.AddItem(slot.Item.Name, slot.Count);
-        slot.Reduce(slot.Count);
-        
+        if (SecondInventory.InventoryController.AddItem(slot.Item.Name, slot.Count) == ItemAddResult.Success)
+        {
+            slot.Reduce(slot.Count);
+        }
+
         FirstInventory.InventoryController.Inventory.DebugItems();
         SecondInventory.InventoryController.Inventory.DebugItems();
     }

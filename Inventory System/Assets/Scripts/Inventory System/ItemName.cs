@@ -20,6 +20,7 @@ namespace InventorySystem
         Quest1 = 256,
         Quest2 = 512,
     }
+    
     [Flags]
     public enum ItemTag
     {
@@ -38,5 +39,10 @@ namespace InventorySystem
         None,
         LootCrate,
         Carmine,
+        Backpack_1lvl,
+        Backpack_2lvl,
+        Backpack_3lvl,
+        Tomato,
+        Potato,
     }
 }

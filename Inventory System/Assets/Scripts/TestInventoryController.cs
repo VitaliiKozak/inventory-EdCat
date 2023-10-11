@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using InventorySystem;
 using UnityEngine;
 
@@ -14,7 +11,7 @@ public class TestInventoryController : MonoBehaviour
   {
     InventoryController = new InventoryController(ItemsDataRepository, Descriptor);
     InventoryController.Init();
-    InventoryController.Inventory.AddItem(ItemName.LootCrate, 1);
+    InventoryController.AddItem(ItemName.LootCrate, 1);
     InventoryController.Inventory.DebugItems();
   }
 }

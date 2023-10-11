@@ -4,9 +4,18 @@ using UnityEngine;
 using System.Linq;
 namespace InventorySystem
 {
+    public interface IInventory
+    {
+        bool HasItem(ItemName name);
+        bool HasFreeSlot();
+        ItemAddResult AddItem(ItemName itemName, int count);
+        ItemReduceResult ReduceItem(ItemName itemName, int count);
+        MoveItemResult MoveItemTo(ItemName itemName, int slotId);
+        SwapItemResult SwapItems(ItemName itemName, int slotId);
+    }
 
     [System.Serializable]
-    public class Inventory
+    public class Inventory : IInventory
     {
         public List<Slot> Slots { get; private set; }
         private readonly IItemsDataRepository _repository;
@@ -28,7 +37,7 @@ namespace InventorySystem
 
         public bool HasFreeSlot()
         {
-            return Slots.Any(x => x.IsFree == true && x.IsAvailable);
+            return Slots.Any(x => x.IsFree == true && x.IsAvailable == true);
         }
 
         public ItemAddResult AddItem(ItemName itemName, int count)
@@ -61,7 +70,7 @@ namespace InventorySystem
             
             return ItemReduceResult.Success;
         }
-
+        //inner inventory
         public MoveItemResult MoveItemTo(ItemName itemName, int slotId)
         {
             if (HasItem(itemName) == false) return MoveItemResult.NoSuchItem;
@@ -85,7 +94,34 @@ namespace InventorySystem
             
             return MoveItemResult.Success;
         }
-        
+
+
+        //inner inventory
+        public SwapItemResult SwapItems(ItemName itemName, int slotId)
+        {
+            if (HasItem(itemName) == false) return SwapItemResult.NoSuchItem;
+
+            var preferSlot = Slots.Find(x => x.Id == slotId);
+            if(preferSlot == null) return SwapItemResult.NoSelectedSlot;
+            
+            if(preferSlot.IsAvailable == false) return SwapItemResult.SelectedSlotNotAvailable;
+            if(preferSlot.IsFree == true) return SwapItemResult.SelectedSlotEmpty;
+            
+            var currentSlot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
+            if(preferSlot.Id == currentSlot.Id ) return SwapItemResult.CurrentSlotMatchesSelected;
+            
+            if(preferSlot.Tags.HasFlag(currentSlot.Item.SlotsData) == false) return SwapItemResult.SelectedSlotTagMismatch;
+            if(currentSlot.Tags.HasFlag(preferSlot.Item.SlotsData) == false) return SwapItemResult.CurrentSlotTagMismatch;
+            
+            var count = currentSlot.Count;
+            var data = currentSlot.Item;
+            
+            currentSlot.SetItem(preferSlot.Item, preferSlot.Count);
+            preferSlot.SetItem(data, count);
+            
+            return SwapItemResult.Success;
+        }
+
         public void DebugItems()
         {
             var data = "Inventory:\n";
@@ -123,5 +159,18 @@ namespace InventorySystem
         SelectedSlotOccupied,       // Indicates that the selected slot is already occupied
         CurrentSlotMatchesSelected, // Indicates that the current slot matches the selected slot
         SelectedSlotMissingTag,     // Indicates that the selected slot doesn't have the required tag
+    }
+
+    public enum SwapItemResult
+    {
+        None,                       // No issues
+        Success,                    // Indicates success
+        NoSuchItem,                 // Indicates that there is no such item
+        NoSelectedSlot,             // Indicates that no slot is selected
+        SelectedSlotNotAvailable,   // Indicates that the selected slot is not available
+        SelectedSlotEmpty,          // Indicates that the selected slot is empty
+        CurrentSlotMatchesSelected, // Indicates that the current slot matches the selected slot
+        SelectedSlotTagMismatch,    // Indicates that the selected slot doesn't match required tags
+        CurrentSlotTagMismatch,      // Indicates that the current slot doesn't match required tags
     }
 }

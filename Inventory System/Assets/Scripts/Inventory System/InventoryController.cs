@@ -5,14 +5,14 @@ using UnityEngine;
 namespace InventorySystem
 {
     [System.Serializable]
-    public class InventoryController
+    public class InventoryController:IInventory
     {
         public InventoryType Type => _inventoryDescriptor.Type;
         public Inventory  Inventory => _inventory;
         
-        private readonly  ItemsDataRepository _itemsDataRepository;
-        private readonly Inventory _inventory;
-        private readonly InventoryDescriptor _inventoryDescriptor;
+        protected readonly  ItemsDataRepository _itemsDataRepository;
+        protected readonly Inventory _inventory;
+        protected readonly InventoryDescriptor _inventoryDescriptor;
         
         public InventoryController(ItemsDataRepository itemsDataRepository,InventoryDescriptor inventoryDescriptor)
         {
@@ -33,6 +33,36 @@ namespace InventorySystem
                     index++;
                 }
             }
+        }
+
+        public virtual bool HasItem(ItemName name)
+        {
+            return _inventory.HasItem(name);
+        }
+
+        public virtual bool HasFreeSlot()
+        {
+            return _inventory.HasFreeSlot();
+        }
+
+        public virtual ItemAddResult AddItem(ItemName itemName, int count)
+        {
+            return _inventory.AddItem(itemName, count);
+        }
+
+        public virtual ItemReduceResult ReduceItem(ItemName itemName, int count)
+        {
+            return _inventory.ReduceItem(itemName, count);
+        }
+
+        public virtual MoveItemResult MoveItemTo(ItemName itemName, int slotId)
+        {
+            return _inventory.MoveItemTo(itemName, slotId);
+        }
+
+        public virtual SwapItemResult SwapItems(ItemName itemName, int slotId)
+        {
+            return _inventory.SwapItems(itemName, slotId);
         }
     }
 

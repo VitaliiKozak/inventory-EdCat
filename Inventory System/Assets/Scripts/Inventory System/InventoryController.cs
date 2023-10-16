@@ -14,26 +14,30 @@ namespace InventorySystem
         protected readonly  ItemsDataRepository _itemsDataRepository;
         protected readonly Inventory _inventory;
         protected readonly InventoryDescriptor _inventoryDescriptor;
-        
-        public InventoryController(ItemsDataRepository itemsDataRepository,InventoryDescriptor inventoryDescriptor)
+        protected readonly ICapacityProvider _capacityProvider;
+        public InventoryController(ItemsDataRepository itemsDataRepository,InventoryDescriptor inventoryDescriptor,ICapacityProvider capacityProvider)
         {
             _itemsDataRepository = itemsDataRepository;
             _inventory = new Inventory(_itemsDataRepository);
             _inventoryDescriptor = inventoryDescriptor;
+            _capacityProvider = capacityProvider;
         }
 
         public void Init()
         {
             var index = 0;
+            var availableSlots = _capacityProvider.GetCapacity();
             foreach (var slotInitData in _inventoryDescriptor.SlotsToInit)
             {
                 for (int i = 0; i < slotInitData.Count; i++)
                 {
                     _inventory.AddSlot(new Slot(index +slotInitData.AditionalIndex, slotInitData.Tags,_inventoryDescriptor.Type));
-                    _inventory.Slots[^1].SetAvailable(index < _inventoryDescriptor.BaseAvailableSlots);
+                    _inventory.Slots[^1].SetAvailable(index < availableSlots);
                     index++;
                 }
             }
+            _capacityProvider.OnCapacityChangeEvent.AddListener(ChangeCapacityCallback);
+            ChangeCapacityCallback(_capacityProvider.GetCapacity());
         }
 
         public virtual bool HasItem(ItemName name)
@@ -112,6 +116,14 @@ namespace InventorySystem
         public SwapItemResult CanSwapItems(ItemName itemName, int slotId)
         {
             return _inventory.CanSwapItems(itemName, slotId);
+        }
+        
+        private void ChangeCapacityCallback(int count)
+        {
+            for (int i = 0; i < _inventory.Slots.Count; i++)
+            {
+                _inventory.Slots[i].SetAvailable(i < count);
+            }
         }
     }
 

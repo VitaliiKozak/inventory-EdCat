@@ -62,7 +62,7 @@ namespace InventorySystem
 
             if (HasFreeSlot() == false) return ItemAddResult.AbsenceOfEmptySlots;
             var data = _repository.GetItemData(itemName);
-            var slot = Slots.Find(x => x.IsFree && x.IsAvailable && x.Tags.HasFlag(data.SlotsData));
+            var slot = Slots.Find(x => x.IsFree && x.IsAvailable && (x.Tags & data.SlotsData) != SlotTag.Nothing);
 
             if (slot == null) return ItemAddResult.AbsenceOfSlotsWithSuitableTag;
             

@@ -47,7 +47,6 @@ namespace UI
         
         public void OnDrop(PointerEventData eventData)
         {
-            Debug.LogError("Drop" + eventData.pointerDrag.name);
             if (eventData.pointerDrag.TryGetComponent<Cell>(out var cell) == true)
             {
                 OnDropEvent?.Invoke(this,cell);

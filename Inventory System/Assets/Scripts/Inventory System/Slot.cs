@@ -7,6 +7,7 @@ namespace InventorySystem
 {
     public interface ISlotInfo
     {
+        public InventoryType InventoryType { get; }
         int Id { get; }
         int Count { get; }
         bool IsFree { get; }
@@ -18,6 +19,7 @@ namespace InventorySystem
     [System.Serializable]
     public class Slot :ISlotInfo
     {
+        public InventoryType InventoryType { get; private set; }
         public int Id { get; private set; }
         public int Count { get; private set; }
         public SlotTag Tags { get; private set; }
@@ -26,13 +28,14 @@ namespace InventorySystem
         public bool IsFree => Item == null;
         public SimpleEvent<ISlotInfo> OnInfoChangeEvent { get; private set; } = new SimpleEvent<ISlotInfo>();
         
-        public Slot(int id, SlotTag tags)
+        public Slot(int id, SlotTag tags, InventoryType type)
         {
             Id = id;
             Count = 0;
             Tags = tags;
             IsAvailable = false;
             Item = null;
+            InventoryType = type;
             NotifyCountChange();
         }
 

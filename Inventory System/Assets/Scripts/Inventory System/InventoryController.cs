@@ -6,7 +6,7 @@ using UnityEngine;
 namespace InventorySystem
 {
     [System.Serializable]
-    public class InventoryController:IInventory
+    public class InventoryController:IInventory, IInventoryCheck
     {
         public InventoryType Type => _inventoryDescriptor.Type;
         public Inventory  Inventory => _inventory;
@@ -29,7 +29,7 @@ namespace InventorySystem
             {
                 for (int i = 0; i < slotInitData.Count; i++)
                 {
-                    _inventory.AddSlot(new Slot(index +slotInitData.AditionalIndex, slotInitData.Tags));
+                    _inventory.AddSlot(new Slot(index +slotInitData.AditionalIndex, slotInitData.Tags,_inventoryDescriptor.Type));
                     _inventory.Slots[^1].SetAvailable(index < _inventoryDescriptor.BaseAvailableSlots);
                     index++;
                 }
@@ -82,6 +82,26 @@ namespace InventorySystem
             }
 
             return MoveItemResult.SelectedSlotMissingTag;
+        }
+
+        public ItemAddResult CanAddItem(ItemName itemName, int count)
+        {
+            return _inventory.CanAddItem(itemName, count);
+        }
+
+        public ItemReduceResult CanReduceItem(ItemName itemName, int count)
+        {
+            return _inventory.CanReduceItem(itemName, count);
+        }
+
+        public MoveItemResult CanMoveItemTo(ItemName itemName, int slotId)
+        {
+            return _inventory.CanMoveItemTo(itemName, slotId);
+        }
+
+        public SwapItemResult CanSwapItems(ItemName itemName, int slotId)
+        {
+            return _inventory.CanSwapItems(itemName, slotId);
         }
     }
 

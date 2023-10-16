@@ -14,6 +14,7 @@ public class TestInventoryController : MonoBehaviour
     InventoryController.AddItem(ItemName.LootCrate, 1);
     InventoryController.AddItem(ItemName.Potato, 1);
     InventoryController.AddItem(ItemName.Carmine, 1);
+    InventoryController.AddItem(ItemName.Backpack_1lvl, 1);
     InventoryController.Inventory.DebugItems();
     
     InventoryManagement.AddInventory(InventoryController);

@@ -12,6 +12,9 @@ namespace InventorySystem
         ItemReduceResult ReduceItem(ItemName itemName, int count);
         MoveItemResult MoveItemTo(ItemName itemName, int slotId);
         SwapItemResult SwapItems(ItemName itemName, int slotId);
+
+        Slot GetSlot(int id);
+        Slot GetSlot(ItemName itemName);
     }
 
     public interface IInventoryCheck
@@ -117,6 +120,7 @@ namespace InventorySystem
             var currentSlot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
             if(preferSlot.Id == currentSlot.Id ) return SwapItemResult.CurrentSlotMatchesSelected;
             
+            Debug.LogError("Possible bug. Check tags cheking ");
             if(preferSlot.Tags.HasFlag(currentSlot.Item.SlotsData) == false) return SwapItemResult.SelectedSlotTagMismatch;
             if(currentSlot.Tags.HasFlag(preferSlot.Item.SlotsData) == false) return SwapItemResult.CurrentSlotTagMismatch;
             
@@ -127,6 +131,16 @@ namespace InventorySystem
             preferSlot.SetItem(data, count);
             
             return SwapItemResult.Success;
+        }
+
+        public Slot GetSlot(int id)
+        {
+            return Slots.Find(x => x.Id == id);
+        }
+
+        public Slot GetSlot(ItemName itemName)
+        {
+            return Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
         }
 
         public void DebugItems()

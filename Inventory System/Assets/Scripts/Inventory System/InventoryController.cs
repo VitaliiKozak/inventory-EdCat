@@ -72,6 +72,16 @@ namespace InventorySystem
             return _inventory.SwapItems(itemName, slotId);
         }
 
+        public Slot GetSlot(int id)
+        {
+            return _inventory.GetSlot(id);
+        }
+
+        public Slot GetSlot(ItemName itemName)
+        {
+            return _inventory.GetSlot(itemName);
+        }
+
         private MoveItemResult SwapItemToOccupied(ItemName itemName, int slotId)
         {
             var result = SwapItems(itemName, slotId);

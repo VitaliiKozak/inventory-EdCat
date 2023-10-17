@@ -12,25 +12,14 @@ namespace UI
         [SerializeField] private RectTransform _dragItemParent;
         [SerializeField] private RectTransform _cellParent;
         [SerializeField] private Cell _cellPrefab;
-        [SerializeField] private TestInventoryController _inventoryController;
         [SerializeField] private SlotTag _undragedSlot;
         [SerializeField] private InventoryManagement _inventoryManagement;
         private List<Cell> _cells;
 
-        private void Awake()
+        public void TestInit(Inventory inventory)
         {
             _cells = new List<Cell>();
-        }
-
-        private void Start()
-        {
-            StartCoroutine(TestInit());
-        }
-        
-        private IEnumerator TestInit()
-        {
-            yield return new WaitForSeconds(0.1f);
-            for (int i = 0; i < _inventoryController.InventoryController.Slots.Count; i++)
+            for (int i = 0; i < inventory.Slots.Count; i++)
             {
                 var cell = Instantiate(_cellPrefab, Vector3.zero, Quaternion.identity, _cellParent);
                 _cells.Add(cell);
@@ -38,7 +27,7 @@ namespace UI
                 cell.OnBeginDragEvent += BeginDragCallback;
                 cell.OnEndDragEvent += EndDragCallback;
                 cell.OnDropEvent += DropCallback;
-                cell.Init(_inventoryController.InventoryController.Slots[i]);
+                cell.Init(inventory.Slots[i]);
                 cell.Subscribe();
                 cell.UpdateData();
             }

@@ -31,15 +31,10 @@ namespace InventorySystem
         {
             if (from.InventoryType == to.InventoryType)
             {
-                //Inventory A to Inventory A
                 return GetController(from.InventoryType).MoveItemTo(from.Item.Name, to.Id);
-
             }
             else
             {
-                //Inventory A to Inventory B
-                Debug.LogError("MoveItem Inventory A to Inventory B");
-
                 if (to.IsFree == false)
                 {
                     switch (SwapItem(from, to))
@@ -50,7 +45,6 @@ namespace InventorySystem
                             return MoveItemResult.None;
                     }
                 }
-                
                 var toController = GetController(to.InventoryType);
                 switch (toController.CanAddItem(from.Item.Name, from.Count))
                 {
@@ -71,8 +65,6 @@ namespace InventorySystem
                         return MoveItemResult.Success;
                     }
                 }
-
-
                 return MoveItemResult.None;
             }
         }
@@ -81,12 +73,10 @@ namespace InventorySystem
         {
             if (from.InventoryType == to.InventoryType)
             {
-                //Inventory A to Inventory A
                 return GetController(from.InventoryType).SwapItems(from.Item.Name, to.Id);
             }
             else
             {
-                Debug.LogError("SwapItem Inventory A to Inventory B");
                 if (to.IsAvailable == false || from.IsAvailable == false) return SwapItemResult.SelectedSlotNotAvailable;
                 if (to.IsFree == true ||from.IsFree == true ) return SwapItemResult.SelectedSlotEmpty;
 
@@ -110,24 +100,20 @@ namespace InventorySystem
                     slotTo.Add(countFrom);
                     return SwapItemResult.Success;
                 }
-                
                 if (fromController.HasItem(to.Item.Name) == true)
                 {
                     var slot = fromController.GetSlot(to.Item.Name);
                     countTo += slot.Count;
                     slot.Reduce(slot.Count);
                 }
-                
                 if (toController.HasItem(from.Item.Name) == true)
                 {
                     var slot = toController.GetSlot(from.Item.Name);
                     countFrom += slot.Count;
                     slot.Reduce(slot.Count);
                 }
-                
                 fromController.GetSlot(from.Id).SetItem(dataTo,countTo);
                 toController.GetSlot(to.Id).SetItem(dataFrom,countFrom);
-                //Inventory A to Inventory B
                 return SwapItemResult.Success;
             }
         }

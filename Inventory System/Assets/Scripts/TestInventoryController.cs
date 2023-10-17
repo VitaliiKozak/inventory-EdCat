@@ -1,22 +1,73 @@
+using System;
 using InventorySystem;
+using UI;
 using UnityEngine;
 
 public class TestInventoryController : MonoBehaviour
 {
   public ItemsDataRepository ItemsDataRepository;
-  public InventoryDescriptor Descriptor;
-  public Inventory InventoryController;
   public InventoryManagement InventoryManagement;
+  
+  //Stock
+  public Inventory StockInventory;
+  public InventoryDescriptor StockDescriptor;
+  public StockController StockView; 
+  
+  //equipment
+  public Inventory EquipmentInventory;
+  public InventoryDescriptor EquipmentDescriptor; 
+  public StockController EquipmentView;
+  
+  //player
+  public Inventory PlayerInventory;
+  public InventoryDescriptor PlayerDescriptor;
+  public StockController PlayerView;
+  
   private void Start()
   {
-    InventoryController = new Inventory(ItemsDataRepository, Descriptor, new InfinityCapacityProvider());
-    InventoryController.Init();
-    InventoryController.AddItem(ItemName.LootCrate, 1);
-    InventoryController.AddItem(ItemName.Potato, 1);
-    InventoryController.AddItem(ItemName.Carmine, 1);
-    InventoryController.AddItem(ItemName.Backpack_1lvl, 1);
-    InventoryController.DebugItems();
+    InitStockInventory();
+    InitEquipmentInventory();
+    InitPlayerInventory();
+  }
+
+  private void InitPlayerInventory()
+  {
+    var provider = new EquipmentCapacityProvider(EquipmentInventory.Slots.Find(x => x.Tags.HasFlag(SlotTag.Backpack)));
+    PlayerInventory = new Inventory(ItemsDataRepository, PlayerDescriptor, provider);
+    PlayerInventory.Init();
+    PlayerInventory.AddItem(ItemName.LootCrate, 1);
+    PlayerInventory.AddItem(ItemName.Potato, 1);
+    PlayerInventory.AddItem(ItemName.Carmine, 1);
+    PlayerInventory.AddItem(ItemName.Backpack_2lvl, 1);
+    PlayerInventory.DebugItems();
     
-    InventoryManagement.AddInventory(InventoryController);
+    InventoryManagement.AddInventory(PlayerInventory);
+    PlayerView?.TestInit(PlayerInventory);
+  }
+  private void InitStockInventory()
+  {
+    StockInventory = new Inventory(ItemsDataRepository, StockDescriptor, new InfinityCapacityProvider());
+    StockInventory.Init();
+    StockInventory.AddItem(ItemName.LootCrate, 1);
+    StockInventory.AddItem(ItemName.Potato, 1);
+    StockInventory.AddItem(ItemName.Carmine, 1);
+    StockInventory.DebugItems();
+    
+    InventoryManagement.AddInventory(StockInventory);
+    StockView?.TestInit(StockInventory);
+  }
+  
+  private void InitEquipmentInventory()
+  {
+    EquipmentInventory = new Inventory(ItemsDataRepository, EquipmentDescriptor, new InfinityCapacityProvider());
+    EquipmentInventory.Init();
+    EquipmentInventory.AddItem(ItemName.LootCrate, 1);
+    EquipmentInventory.AddItem(ItemName.Potato, 1);
+    EquipmentInventory.AddItem(ItemName.Carmine, 1);
+    EquipmentInventory.AddItem(ItemName.Backpack_1lvl, 1);
+    EquipmentInventory.DebugItems();
+    
+    InventoryManagement.AddInventory(EquipmentInventory);
+    EquipmentView?.TestInit(EquipmentInventory);
   }
 }

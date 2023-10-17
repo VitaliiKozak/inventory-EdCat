@@ -16,5 +16,5 @@ MonoBehaviour:
   BaseAvailableSlots: 100
   SlotsToInit:
   - AditionalIndex: 0
-    Count: 100
+    Count: 25
     Tags: 64

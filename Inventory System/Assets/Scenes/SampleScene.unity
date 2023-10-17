@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 316666496}
   - component: {fileID: 316666495}
   m_Layer: 5
-  m_Name: EquipmentController (1)
+  m_Name: PlayerController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -177,7 +177,6 @@ MonoBehaviour:
   _dragItemParent: {fileID: 697191237}
   _cellParent: {fileID: 1036791705}
   _cellPrefab: {fileID: 757073931770405265, guid: ac6d73c2625825f4fbfea94e9fd01dfa, type: 3}
-  _inventoryController: {fileID: 546028090}
   _undragedSlot: 768
   _inventoryManagement: {fileID: 1479439159}
 --- !u!222 &316666496
@@ -188,53 +187,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 316666493}
   m_CullTransparentMesh: 1
---- !u!1 &374987795
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 374987797}
-  - component: {fileID: 374987796}
-  m_Layer: 0
-  m_Name: Equipment
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &374987796
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 374987795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f6bc5beecbd82d4599935e816757c06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ItemsDataRepository: {fileID: 1510460919}
-  Descriptor: {fileID: 11400000, guid: 380f4dc5d1a6f5a4993a744ad1895c6f, type: 2}
-  InventoryManagement: {fileID: 1479439159}
---- !u!4 &374987797
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 374987795}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &546028089
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,8 +217,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ItemsDataRepository: {fileID: 1510460919}
-  Descriptor: {fileID: 11400000, guid: f303b21607e66e24cb693e71fa2cdbeb, type: 2}
   InventoryManagement: {fileID: 1479439159}
+  StockDescriptor: {fileID: 11400000, guid: f303b21607e66e24cb693e71fa2cdbeb, type: 2}
+  StockView: {fileID: 0}
+  EquipmentDescriptor: {fileID: 11400000, guid: 380f4dc5d1a6f5a4993a744ad1895c6f, type: 2}
+  EquipmentView: {fileID: 1628426035}
+  PlayerDescriptor: {fileID: 11400000, guid: 03c24c993f42d9541aa0011acb795f12, type: 2}
+  PlayerView: {fileID: 316666495}
 --- !u!4 &546028091
 Transform:
   m_ObjectHideFlags: 0
@@ -478,7 +435,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &960729504
 GameObject:
@@ -922,7 +879,7 @@ RectTransform:
   - {fileID: 1628426034}
   - {fileID: 316666494}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -971,54 +928,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1491556022
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1491556024}
-  - component: {fileID: 1491556023}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1491556023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1491556022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f6bc5beecbd82d4599935e816757c06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ItemsDataRepository: {fileID: 1510460919}
-  Descriptor: {fileID: 11400000, guid: 03c24c993f42d9541aa0011acb795f12, type: 2}
-  InventoryManagement: {fileID: 1479439159}
---- !u!4 &1491556024
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1491556022}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1507672046
 GameObject:
@@ -1133,6 +1043,12 @@ MonoBehaviour:
     <AffectDataList>k__BackingField:
     - <Affect>k__BackingField: 6
       <Value>k__BackingField: 9
+  - <Name>k__BackingField: 4
+    <SlotsData>k__BackingField: 96
+    <TagData>k__BackingField: 0
+    <AffectDataList>k__BackingField:
+    - <Affect>k__BackingField: 6
+      <Value>k__BackingField: 18
   _defaulteData:
     <Name>k__BackingField: 0
     <SlotsData>k__BackingField: 64
@@ -1207,7 +1123,6 @@ MonoBehaviour:
   _dragItemParent: {fileID: 1011340929}
   _cellParent: {fileID: 1507672047}
   _cellPrefab: {fileID: 757073931770405265, guid: ac6d73c2625825f4fbfea94e9fd01dfa, type: 3}
-  _inventoryController: {fileID: 1491556023}
   _undragedSlot: 768
   _inventoryManagement: {fileID: 1479439159}
 --- !u!222 &1628426037

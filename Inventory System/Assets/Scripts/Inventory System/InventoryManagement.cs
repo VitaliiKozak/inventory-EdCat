@@ -7,21 +7,21 @@ namespace InventorySystem
 {
     public class InventoryManagement : MonoBehaviour
     {
-        private Dictionary<InventoryType, InventoryController> _inventoryControllers;
+        private Dictionary<InventoryType, Inventory> _inventoryControllers;
 
         private void Awake()
         {
-            _inventoryControllers = new Dictionary<InventoryType, InventoryController>();
+            _inventoryControllers = new Dictionary<InventoryType, Inventory>();
         }
 
-        public void AddInventory(InventoryController controller)
+        public void AddInventory(Inventory controller)
         {
             if(_inventoryControllers.ContainsKey(controller.Type) == true) return;
             
             _inventoryControllers.Add(controller.Type, controller);
         }
 
-        public InventoryController GetController(InventoryType type)
+        public Inventory GetController(InventoryType type)
         {
             if(_inventoryControllers.ContainsKey(type) == false) return null;
             return _inventoryControllers[type];

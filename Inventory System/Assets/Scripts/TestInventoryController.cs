@@ -5,17 +5,17 @@ public class TestInventoryController : MonoBehaviour
 {
   public ItemsDataRepository ItemsDataRepository;
   public InventoryDescriptor Descriptor;
-  public InventoryController InventoryController;
+  public Inventory InventoryController;
   public InventoryManagement InventoryManagement;
   private void Start()
   {
-    InventoryController = new InventoryController(ItemsDataRepository, Descriptor, new InfinityCapacityProvider());
+    InventoryController = new Inventory(ItemsDataRepository, Descriptor, new InfinityCapacityProvider());
     InventoryController.Init();
     InventoryController.AddItem(ItemName.LootCrate, 1);
     InventoryController.AddItem(ItemName.Potato, 1);
     InventoryController.AddItem(ItemName.Carmine, 1);
     InventoryController.AddItem(ItemName.Backpack_1lvl, 1);
-    InventoryController.Inventory.DebugItems();
+    InventoryController.DebugItems();
     
     InventoryManagement.AddInventory(InventoryController);
   }

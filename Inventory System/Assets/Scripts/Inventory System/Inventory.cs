@@ -6,6 +6,8 @@ namespace InventorySystem
 {
     public interface IInventory
     {
+        InventoryType Type { get; }
+        public void Init();
         bool HasItem(ItemName name);
         bool HasFreeSlot();
         ItemAddResult AddItem(ItemName itemName, int count);
@@ -24,22 +26,56 @@ namespace InventorySystem
         MoveItemResult CanMoveItemTo(ItemName itemName, int slotId);
         SwapItemResult CanSwapItems(ItemName itemName, int slotId);
     }
+    public enum InventoryType
+    {
+        None,
+        Player,
+        Stock,
+        Equipment,
+    }
     
+    [System.Serializable]
+    public struct SlotInitData
+    {
+        public int AditionalIndex;
+        public int Count;
+        public SlotTag Tags;
+    }
 
     [System.Serializable]
     public class Inventory : IInventory, IInventoryCheck
     {
+        public InventoryType Type => _inventoryDescriptor.Type;
         public List<Slot> Slots { get; private set; }
-        private readonly IItemsDataRepository _repository;
-
-        public Inventory(IItemsDataRepository repository)
+        protected readonly IItemsDataRepository _repository;
+        protected readonly InventoryDescriptor _inventoryDescriptor;
+        protected readonly ICapacityProvider _capacityProvider;
+        public Inventory(IItemsDataRepository repository,InventoryDescriptor inventoryDescriptor,ICapacityProvider capacityProvider)
         {
             _repository = repository;
+            _inventoryDescriptor = inventoryDescriptor;
+            _capacityProvider = capacityProvider;
             Slots = new List<Slot>();
         }
         public void AddSlot(Slot slot)
         {
             Slots.Add(slot);
+        }
+        public void Init()
+        {
+            var index = 0;
+            var availableSlots = _capacityProvider.GetCapacity();
+            foreach (var slotInitData in _inventoryDescriptor.SlotsToInit)
+            {
+                for (int i = 0; i < slotInitData.Count; i++)
+                {
+                    AddSlot(new Slot(index +slotInitData.AditionalIndex, slotInitData.Tags,_inventoryDescriptor.Type));
+                    Slots[^1].SetAvailable(index < availableSlots);
+                    index++;
+                }
+            }
+            _capacityProvider.OnCapacityChangeEvent.AddListener(ChangeCapacityCallback);
+            ChangeCapacityCallback(_capacityProvider.GetCapacity());
         }
 
         public bool HasItem(ItemName name)
@@ -92,7 +128,7 @@ namespace InventorySystem
             if(preferSlot == null) return MoveItemResult.NoSelectedSlot;
             
             if(preferSlot.IsAvailable == false)return MoveItemResult.SelectedSlotNotAvailable;
-            if(preferSlot.IsFree == false)return MoveItemResult.SelectedSlotOccupied;
+            if(preferSlot.IsFree == false) return SwapItemToOccupied(itemName, slotId);
 
             var currentSlot = GetSlot(itemName);
             if(preferSlot.Id == currentSlot.Id ) return MoveItemResult.CurrentSlotMatchesSelected;
@@ -205,6 +241,26 @@ namespace InventorySystem
             if((currentSlot.Tags & preferSlot.Item.SlotsData) == SlotTag.Nothing)  return SwapItemResult.CurrentSlotTagMismatch;
 
             return SwapItemResult.Success;
+        }
+        
+        private MoveItemResult SwapItemToOccupied(ItemName itemName, int slotId)
+        {
+            var result = SwapItems(itemName, slotId);
+            
+            if (result == SwapItemResult.Success)
+            {
+                return MoveItemResult.Success;
+            }
+
+            return MoveItemResult.SelectedSlotMissingTag;
+        }
+        
+        private void ChangeCapacityCallback(int count)
+        {
+            for (int i = 0; i < Slots.Count; i++)
+            {
+                Slots[i].SetAvailable(i < count);
+            }
         }
     }
 

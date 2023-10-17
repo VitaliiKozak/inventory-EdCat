@@ -30,7 +30,7 @@ namespace UI
         private IEnumerator TestInit()
         {
             yield return new WaitForSeconds(0.1f);
-            for (int i = 0; i < _inventoryController.InventoryController.Inventory.Slots.Count; i++)
+            for (int i = 0; i < _inventoryController.InventoryController.Slots.Count; i++)
             {
                 var cell = Instantiate(_cellPrefab, Vector3.zero, Quaternion.identity, _cellParent);
                 _cells.Add(cell);
@@ -38,7 +38,7 @@ namespace UI
                 cell.OnBeginDragEvent += BeginDragCallback;
                 cell.OnEndDragEvent += EndDragCallback;
                 cell.OnDropEvent += DropCallback;
-                cell.Init(_inventoryController.InventoryController.Inventory.Slots[i]);
+                cell.Init(_inventoryController.InventoryController.Slots[i]);
                 cell.Subscribe();
                 cell.UpdateData();
             }

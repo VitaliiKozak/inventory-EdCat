@@ -49,8 +49,6 @@ namespace InventorySystem
                         default:
                             return MoveItemResult.None;
                     }
-
-                    
                 }
                 
                 var toController = GetController(to.InventoryType);
@@ -92,8 +90,8 @@ namespace InventorySystem
                 if (to.IsAvailable == false || from.IsAvailable == false) return SwapItemResult.SelectedSlotNotAvailable;
                 if (to.IsFree == true ||from.IsFree == true ) return SwapItemResult.SelectedSlotEmpty;
 
-                if (from.Tags.HasFlag(to.Item.SlotsData) == false) return SwapItemResult.SelectedSlotTagMismatch;
-                if (to.Tags.HasFlag(from.Item.SlotsData) == false) return SwapItemResult.CurrentSlotTagMismatch;
+                if ((from.Tags & to.Item.SlotsData) == SlotTag.Nothing) return SwapItemResult.SelectedSlotTagMismatch;
+                if ((to.Tags & from.Item.SlotsData) == SlotTag.Nothing) return SwapItemResult.CurrentSlotTagMismatch;
 
                 var fromController = GetController(from.InventoryType);
                 var toController = GetController(to.InventoryType);
@@ -103,6 +101,15 @@ namespace InventorySystem
 
                 var countTo = to.Count;
                 var dataTo = to.Item;
+
+                if (dataFrom.Name == dataTo.Name)
+                {
+                    var slotFrom = fromController.GetSlot(from.Item.Name);
+                    slotFrom.Reduce(countFrom);
+                    var slotTo = toController.GetSlot(to.Item.Name);
+                    slotTo.Add(countFrom);
+                    return SwapItemResult.Success;
+                }
                 
                 if (fromController.HasItem(to.Item.Name) == true)
                 {

@@ -56,13 +56,13 @@ namespace InventorySystem
         {
             if (HasItem(itemName) == true)
             {
-                Slots.Find(x =>x.IsFree == false &&  x.Item.Name == itemName).Add(count);
+                GetSlot(itemName).Add(count);
                 return ItemAddResult.Success;
             }
 
             if (HasFreeSlot() == false) return ItemAddResult.AbsenceOfEmptySlots;
             var data = _repository.GetItemData(itemName);
-            var slot = Slots.Find(x => x.IsFree && x.IsAvailable && (x.Tags & data.SlotsData) != SlotTag.Nothing);
+            var slot = Slots.Find(x => x.IsFree == true && x.IsAvailable == true && (x.Tags & data.SlotsData) != SlotTag.Nothing);
 
             if (slot == null) return ItemAddResult.AbsenceOfSlotsWithSuitableTag;
             
@@ -74,7 +74,7 @@ namespace InventorySystem
         {
             if (HasItem(itemName) == false) return ItemReduceResult.AbsenceOfItem;
 
-            var slot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
+            var slot = GetSlot(itemName);
             
             if(slot.CanGet(count) == false) return ItemReduceResult.InsufficientQuantity;
 
@@ -82,22 +82,22 @@ namespace InventorySystem
             
             return ItemReduceResult.Success;
         }
-        //inner inventory
+        
+        
         public MoveItemResult MoveItemTo(ItemName itemName, int slotId)
         {
             if (HasItem(itemName) == false) return MoveItemResult.NoSuchItem;
-            
-            var preferSlot = Slots.Find(x => x.Id == slotId);
+
+            var preferSlot = GetSlot(slotId);
             if(preferSlot == null) return MoveItemResult.NoSelectedSlot;
             
             if(preferSlot.IsAvailable == false)return MoveItemResult.SelectedSlotNotAvailable;
             if(preferSlot.IsFree == false)return MoveItemResult.SelectedSlotOccupied;
-            
-            var currentSlot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
+
+            var currentSlot = GetSlot(itemName);
             if(preferSlot.Id == currentSlot.Id ) return MoveItemResult.CurrentSlotMatchesSelected;
-
-            if(preferSlot.Tags.HasFlag(currentSlot.Item.SlotsData) == false)  return MoveItemResult.SelectedSlotMissingTag;
-
+            if((preferSlot.Tags & currentSlot.Item.SlotsData) == SlotTag.Nothing)  return MoveItemResult.SelectedSlotMissingTag;
+            
             var count = currentSlot.Count;
             var data = currentSlot.Item;
             currentSlot.Reduce(count);
@@ -106,24 +106,23 @@ namespace InventorySystem
             
             return MoveItemResult.Success;
         }
-        //inner inventory
+        
         public SwapItemResult SwapItems(ItemName itemName, int slotId)
         {
             if (HasItem(itemName) == false) return SwapItemResult.NoSuchItem;
 
-            var preferSlot = Slots.Find(x => x.Id == slotId);
+            var preferSlot = GetSlot(slotId);
             if(preferSlot == null) return SwapItemResult.NoSelectedSlot;
             
             if(preferSlot.IsAvailable == false) return SwapItemResult.SelectedSlotNotAvailable;
             if(preferSlot.IsFree == true) return SwapItemResult.SelectedSlotEmpty;
             
-            var currentSlot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
+            var currentSlot = GetSlot(itemName);
             if(preferSlot.Id == currentSlot.Id ) return SwapItemResult.CurrentSlotMatchesSelected;
-            
-            Debug.LogError("Possible bug. Check tags cheking ");
-            if(preferSlot.Tags.HasFlag(currentSlot.Item.SlotsData) == false) return SwapItemResult.SelectedSlotTagMismatch;
-            if(currentSlot.Tags.HasFlag(preferSlot.Item.SlotsData) == false) return SwapItemResult.CurrentSlotTagMismatch;
-            
+
+            if((preferSlot.Tags & currentSlot.Item.SlotsData) == SlotTag.Nothing) return SwapItemResult.SelectedSlotTagMismatch;
+            if((currentSlot.Tags & preferSlot.Item.SlotsData) == SlotTag.Nothing) return SwapItemResult.CurrentSlotTagMismatch;
+
             var count = currentSlot.Count;
             var data = currentSlot.Item;
             
@@ -158,7 +157,7 @@ namespace InventorySystem
             if (HasItem(itemName) == true) return ItemAddResult.Success;
             if (HasFreeSlot() == false) return ItemAddResult.AbsenceOfEmptySlots;
             var data = _repository.GetItemData(itemName);
-            var slot = Slots.Find(x => x.IsFree && x.IsAvailable && x.Tags.HasFlag(data.SlotsData));
+            var slot = Slots.Find(x => x.IsFree == true && x.IsAvailable == true && (x.Tags & data.SlotsData) != SlotTag.Nothing);
             if (slot == null) return ItemAddResult.AbsenceOfSlotsWithSuitableTag;
             return ItemAddResult.Success;
         }
@@ -166,7 +165,7 @@ namespace InventorySystem
         public ItemReduceResult CanReduceItem(ItemName itemName, int count)
         {
             if (HasItem(itemName) == false) return ItemReduceResult.AbsenceOfItem;
-            var slot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
+            var slot = GetSlot(itemName);
             if(slot.CanGet(count) == false) return ItemReduceResult.InsufficientQuantity;
             return ItemReduceResult.Success;
         }
@@ -175,16 +174,16 @@ namespace InventorySystem
         {
             if (HasItem(itemName) == false) return MoveItemResult.NoSuchItem;
             
-            var preferSlot = Slots.Find(x => x.Id == slotId);
+            var preferSlot = GetSlot(slotId);
             if(preferSlot == null) return MoveItemResult.NoSelectedSlot;
             
             if(preferSlot.IsAvailable == false)return MoveItemResult.SelectedSlotNotAvailable;
             if(preferSlot.IsFree == false)return MoveItemResult.SelectedSlotOccupied;
             
-            var currentSlot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
+            var currentSlot = GetSlot(itemName);
             if(preferSlot.Id == currentSlot.Id ) return MoveItemResult.CurrentSlotMatchesSelected;
 
-            if(preferSlot.Tags.HasFlag(currentSlot.Item.SlotsData) == false)  return MoveItemResult.SelectedSlotMissingTag;
+            if((preferSlot.Tags & currentSlot.Item.SlotsData) == SlotTag.Nothing)  return MoveItemResult.SelectedSlotMissingTag;
             
             return MoveItemResult.Success;
         }
@@ -193,17 +192,17 @@ namespace InventorySystem
         {
             if (HasItem(itemName) == false) return SwapItemResult.NoSuchItem;
 
-            var preferSlot = Slots.Find(x => x.Id == slotId);
+            var preferSlot = GetSlot(slotId);
             if(preferSlot == null) return SwapItemResult.NoSelectedSlot;
             
             if(preferSlot.IsAvailable == false) return SwapItemResult.SelectedSlotNotAvailable;
             if(preferSlot.IsFree == true) return SwapItemResult.SelectedSlotEmpty;
             
-            var currentSlot = Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
+            var currentSlot = GetSlot(itemName);
             if(preferSlot.Id == currentSlot.Id ) return SwapItemResult.CurrentSlotMatchesSelected;
             
-            if(preferSlot.Tags.HasFlag(currentSlot.Item.SlotsData) == false) return SwapItemResult.SelectedSlotTagMismatch;
-            if(currentSlot.Tags.HasFlag(preferSlot.Item.SlotsData) == false) return SwapItemResult.CurrentSlotTagMismatch;
+            if((preferSlot.Tags & currentSlot.Item.SlotsData) == SlotTag.Nothing) return SwapItemResult.SelectedSlotTagMismatch;
+            if((currentSlot.Tags & preferSlot.Item.SlotsData) == SlotTag.Nothing)  return SwapItemResult.CurrentSlotTagMismatch;
 
             return SwapItemResult.Success;
         }

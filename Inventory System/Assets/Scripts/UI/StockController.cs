@@ -24,11 +24,12 @@ namespace UI
 
         private void Start()
         {
-            TestInit();
+            StartCoroutine(TestInit());
         }
         
-        private void TestInit()
+        private IEnumerator TestInit()
         {
+            yield return new WaitForSeconds(0.1f);
             for (int i = 0; i < _inventoryController.InventoryController.Inventory.Slots.Count; i++)
             {
                 var cell = Instantiate(_cellPrefab, Vector3.zero, Quaternion.identity, _cellParent);

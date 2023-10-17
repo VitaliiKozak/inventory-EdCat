@@ -6,7 +6,6 @@ namespace InventorySystem
 {
     public interface IInventory
     {
-        InventoryType Type { get; }
         public void Init();
         bool HasItem(ItemName name);
         bool HasFreeSlot();
@@ -26,6 +25,13 @@ namespace InventorySystem
         MoveItemResult CanMoveItemTo(ItemName itemName, int slotId);
         SwapItemResult CanSwapItems(ItemName itemName, int slotId);
     }
+
+    public interface IInventoryInfo
+    {
+        InventoryType Type { get; }
+        int GetItemCount();
+    }
+    
     public enum InventoryType
     {
         None,
@@ -43,10 +49,12 @@ namespace InventorySystem
     }
 
     [System.Serializable]
-    public class Inventory : IInventory, IInventoryCheck
+    public class Inventory : IInventory, IInventoryCheck, IInventoryInfo
     {
         public InventoryType Type => _inventoryDescriptor.Type;
+
         public List<Slot> Slots { get; private set; }
+        
         protected readonly IItemsDataRepository _repository;
         protected readonly InventoryDescriptor _inventoryDescriptor;
         protected readonly ICapacityProvider _capacityProvider;
@@ -118,7 +126,6 @@ namespace InventorySystem
             
             return ItemReduceResult.Success;
         }
-        
         
         public MoveItemResult MoveItemTo(ItemName itemName, int slotId)
         {
@@ -261,6 +268,11 @@ namespace InventorySystem
             {
                 Slots[i].SetAvailable(i < count);
             }
+        }
+        
+        public int GetItemCount()
+        {
+            return Slots.FindAll(x => x.IsFree == false && x.IsAvailable == true).Count;
         }
     }
 

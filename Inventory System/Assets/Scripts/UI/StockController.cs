@@ -48,7 +48,6 @@ namespace UI
         {
             if(dragged.IsDragProcess == false) return;
             Debug.LogError($"Drop Item from Cell = {dragged.name} To {cell.name}");
-            //Debug.LogError(  _inventoryController.InventoryController.MoveItemTo(dragged.SlotInfo.Item.Name, cell.SlotInfo.Id));
             _inventoryManagement.MoveItem(dragged.SlotInfo, cell.SlotInfo);
         }
 

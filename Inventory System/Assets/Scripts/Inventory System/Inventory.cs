@@ -335,5 +335,11 @@ namespace InventorySystem
     {
         None,                       // No issues
         Success,                    // Indicates success
+        CurrentSlotEmpty = 2,                // Indicates that the current slot is empty
+        CurrentSlotNotAvailable = 3,        // Indicates that the current slot is not available
+        SelectedSlotNotAvailable = 4,       // Indicates that the selected slot is not available
+        SelectedSlotTagMismatch = 5,        // Indicates that the selected slot doesn't match required tags
+        ItemsAreSame = 6,                   // Indicates that the selected and current items are the same
+        InventoryFull = 7                   // Indicates that the inventory is full
     }
 }

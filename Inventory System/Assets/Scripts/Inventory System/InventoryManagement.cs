@@ -33,116 +33,91 @@ namespace InventorySystem
             {
                 return GetController(from.InventoryType).MoveItemTo(from.Item.Name, to.Id);
             }
-            else
-            {
-                if (to.IsFree == false)
-                {
-                    switch (SwapItem(from, to))
-                    {
-                        case SwapItemResult.Success:
-                            return MoveItemResult.Success;
-                        default:
-                            return MoveItemResult.None;
-                    }
-                }
-                var toController = GetController(to.InventoryType);
-                switch (toController.CanAddItem(from.Item.Name, from.Count))
-                {
-                    case ItemAddResult.AbsenceOfEmptySlots:
-                        break;
-                    case ItemAddResult.AbsenceOfSlotsWithSuitableTag:
-                        break;
-                    case ItemAddResult.Success:
-                    {
-                        var fromController = GetController(from.InventoryType);
 
-                        var itemName = from.Item.Name;
-                        var itemCount = from.Count;
-                        var moveItem = toController.HasItem(itemName) == false;
-                        fromController.ReduceItem(itemName, itemCount);
-                        toController.AddItem(itemName, itemCount);
-                        if (moveItem == true)  toController.MoveItemTo(itemName, to.Id);
+            if (to.IsFree == false)
+            {
+                switch (SwapItem(from, to))
+                {
+                    case SwapItemResult.Success:
                         return MoveItemResult.Success;
-                    }
+                    default:
+                        return MoveItemResult.None;
                 }
-                return MoveItemResult.None;
             }
+
+            var toController = GetController(to.InventoryType);
+            switch (toController.CanAddItem(from.Item.Name, from.Count))
+            {
+                case ItemAddResult.AbsenceOfEmptySlots:
+                    break;
+                case ItemAddResult.AbsenceOfSlotsWithSuitableTag:
+                    break;
+                case ItemAddResult.Success:
+                {
+                    var fromController = GetController(from.InventoryType);
+
+                    var itemName = from.Item.Name;
+                    var itemCount = from.Count;
+                    var moveItem = toController.HasItem(itemName) == false;
+                    fromController.ReduceItem(itemName, itemCount);
+                    toController.AddItem(itemName, itemCount);
+                    if (moveItem == true) toController.MoveItemTo(itemName, to.Id);
+                    return MoveItemResult.Success;
+                }
+            }
+            return MoveItemResult.None;
         }
 
         public EquipItemResult EquipItem(ISlotInfo from, ISlotInfo to)
         {
-            if (from.IsFree == true) return EquipItemResult.None;
-            if (from.IsAvailable == false) return EquipItemResult.None;
-            if (to.IsAvailable == false) return EquipItemResult.None;
+            if (from.IsFree == true) return EquipItemResult.CurrentSlotEmpty;
+            if (from.IsAvailable == false) return EquipItemResult.CurrentSlotNotAvailable;
+            if (to.IsAvailable == false) return EquipItemResult.SelectedSlotNotAvailable;
 
-            if((to.Tags & from.Item.SlotsData) == SlotTag.Nothing) return EquipItemResult.None;
-            
+            if ((to.Tags & from.Item.SlotsData) == SlotTag.Nothing) return EquipItemResult.SelectedSlotTagMismatch;
+
             var toController = GetController(to.InventoryType);
             var fromController = GetController(from.InventoryType);
-            
+
             if (to.IsFree == true)
             {
-                Debug.LogError("just equip");
-                //just equip
-                toController.GetSlot(to.Id).SetItem(from.Item,1);
+                toController.GetSlot(to.Id).SetItem(from.Item, 1);
                 fromController.GetSlot(from.Id).Reduce(1);
-                
                 return EquipItemResult.Success;
+            }
+
+            if (from.Item.Name == to.Item.Name) return EquipItemResult.ItemsAreSame;
+
+            var fromInventoryHasSlotWithThisEquip = fromController.HasSlot(x => x.IsFree == false && x.Item.Name == to.Item.Name);
+            var fromInventoryHasFreeSlotForToItem = fromController.HasSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing);
+            if (fromInventoryHasFreeSlotForToItem == false && fromInventoryHasSlotWithThisEquip == false)
+            {
+                if (from.Count == 1 && to.Count == 1 && (from.Tags & to.Item.SlotsData) != SlotTag.Nothing)
+                {
+                    var fromData = from.Item;
+                    var fromCount = from.Count;
+                    fromController.GetSlot(from.Id).SetItem(to.Item, to.Count);
+                    toController.GetSlot(to.Id).SetItem(fromData, fromCount);
+                    return EquipItemResult.Success;
+                }
+
+                return EquipItemResult.InventoryFull;
+            }
+
+            if (fromInventoryHasSlotWithThisEquip == true)
+            {
+                fromController.GetSlot(to.Item.Name).Add(to.Count);
             }
             else
             {
-                if(from.Item.Name == to.Item.Name) return EquipItemResult.None;
-                
-                var fromInventoryHasSlotWithThisEquip = fromController.HasSlot(x => x.IsFree == false && x.Item.Name == to.Item.Name);
-                var fromInventoryHasFreeSlotForToItem = fromController.HasSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing);
-                if (fromInventoryHasFreeSlotForToItem == false && fromInventoryHasSlotWithThisEquip == false)
-                {
-                    if (from.Count == 1)//check to slot too
-                    {
-                        if ((from.Tags & to.Item.SlotsData) != SlotTag.Nothing)
-                        {
-                            //put where we take
-                            Debug.LogError("put where we take and equip");
-                            var fromData = from.Item;
-                            var fromCount = from.Count;
-                            var fromSlot = fromController.GetSlot(from.Id);
-                            fromSlot.SetItem(to.Item, to.Count);
-                            var toSlot = toController.GetSlot(to.Id);
-                            
-                            toSlot.SetItem(fromData, fromCount);
-                            return EquipItemResult.Success;
-                        }
-                        else
-                        {
-                            return EquipItemResult.None;
-                        }
-                    }
-                    else
-                    {
-                        return EquipItemResult.None;
-                    }
-                }
-
-                if (fromInventoryHasSlotWithThisEquip == true)
-                {
-                    var slot = fromController.GetSlot(to.Item.Name);
-                    slot.Add(to.Count);
-                    toController.GetSlot(to.Id).SetItem(from.Item,1);
-                    fromController.ReduceItem(from.Item.Name, 1);
-                    Debug.LogError("unequip in exist and equip");
-                    return EquipItemResult.Success;
-                }
-                else
-                {
-                    var slot = fromController.GetSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing);
-               
-                    slot.SetItem(to.Item, to.Count);
-                    toController.GetSlot(to.Id).SetItem(from.Item,1);
-                    fromController.ReduceItem(from.Item.Name, 1);
-                    Debug.LogError("unequip in new  and equip");
-                    return EquipItemResult.Success;
-                }
+                fromController
+                    .GetSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing)
+                    .SetItem(to.Item, to.Count);
             }
+
+            toController.GetSlot(to.Id).SetItem(from.Item, 1);
+            fromController.ReduceItem(from.Item.Name, 1);
+            return EquipItemResult.Success;
         }
 
         public SwapItemResult SwapItem(ISlotInfo from, ISlotInfo to)
@@ -170,10 +145,8 @@ namespace InventorySystem
 
                 if (dataFrom.Name == dataTo.Name)
                 {
-                    var slotFrom = fromController.GetSlot(from.Item.Name);
-                    slotFrom.Reduce(countFrom);
-                    var slotTo = toController.GetSlot(to.Item.Name);
-                    slotTo.Add(countFrom);
+                    fromController.GetSlot(from.Item.Name).Reduce(countFrom);
+                    toController.GetSlot(to.Item.Name).Add(countFrom);
                     return SwapItemResult.Success;
                 }
                 if (fromController.HasItem(to.Item.Name) == true)

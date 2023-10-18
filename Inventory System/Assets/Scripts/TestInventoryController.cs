@@ -39,8 +39,8 @@ public class TestInventoryController : MonoBehaviour
     PlayerInventory.AddItem(ItemName.Potato, 1);
     PlayerInventory.AddItem(ItemName.Carmine, 1);
     PlayerInventory.AddItem(ItemName.Backpack_2lvl, 1);
-    PlayerInventory.AddItem(ItemName.Weapon_TypeA, 1);
-    PlayerInventory.AddItem(ItemName.Weapon_TypeB, 1);
+    PlayerInventory.AddItem(ItemName.Weapon_TypeA, 2);
+    PlayerInventory.AddItem(ItemName.Weapon_TypeB, 5);
     PlayerInventory.DebugItems();
     
     InventoryManagement.AddInventory(PlayerInventory);

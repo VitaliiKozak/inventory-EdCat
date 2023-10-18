@@ -82,6 +82,7 @@ namespace InventorySystem
             
             if (to.IsFree == true)
             {
+                Debug.LogError("just equip");
                 //just equip
                 toController.GetSlot(to.Id).SetItem(from.Item,1);
                 fromController.GetSlot(from.Id).Reduce(1);
@@ -90,14 +91,18 @@ namespace InventorySystem
             }
             else
             {
-                if (fromController.HasSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing) == false)
+                if(from.Item.Name == to.Item.Name) return EquipItemResult.None;
+                
+                var fromInventoryHasSlotWithThisEquip = fromController.HasSlot(x => x.IsFree == false && x.Item.Name == to.Item.Name);
+                var fromInventoryHasFreeSlotForToItem = fromController.HasSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing);
+                if (fromInventoryHasFreeSlotForToItem == false && fromInventoryHasSlotWithThisEquip == false)
                 {
-                    if (from.Count == 1)
+                    if (from.Count == 1)//check to slot too
                     {
                         if ((from.Tags & to.Item.SlotsData) != SlotTag.Nothing)
                         {
                             //put where we take
-
+                            Debug.LogError("put where we take and equip");
                             var fromData = from.Item;
                             var fromCount = from.Count;
                             var fromSlot = fromController.GetSlot(from.Id);
@@ -117,14 +122,26 @@ namespace InventorySystem
                         return EquipItemResult.None;
                     }
                 }
-                
-               var slot = fromController.GetSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing);
+
+                if (fromInventoryHasSlotWithThisEquip == true)
+                {
+                    var slot = fromController.GetSlot(to.Item.Name);
+                    slot.Add(to.Count);
+                    toController.GetSlot(to.Id).SetItem(from.Item,1);
+                    fromController.ReduceItem(from.Item.Name, 1);
+                    Debug.LogError("unequip in exist and equip");
+                    return EquipItemResult.Success;
+                }
+                else
+                {
+                    var slot = fromController.GetSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing);
                
-               slot.SetItem(to.Item, to.Count);
-               toController.GetSlot(to.Id).SetItem(from.Item,1);
-               fromController.ReduceItem(from.Item.Name, 1);
-               
-               return EquipItemResult.Success;
+                    slot.SetItem(to.Item, to.Count);
+                    toController.GetSlot(to.Id).SetItem(from.Item,1);
+                    fromController.ReduceItem(from.Item.Name, 1);
+                    Debug.LogError("unequip in new  and equip");
+                    return EquipItemResult.Success;
+                }
             }
         }
 

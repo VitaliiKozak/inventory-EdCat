@@ -1,14 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+
 namespace InventorySystem
 {
     public interface IInventory
     {
         public void Init();
-        bool HasItem(ItemName name);
-        bool HasFreeSlot();
         ItemAddResult AddItem(ItemName itemName, int count);
         ItemReduceResult ReduceItem(ItemName itemName, int count);
         MoveItemResult MoveItemTo(ItemName itemName, int slotId);
@@ -16,6 +16,7 @@ namespace InventorySystem
 
         Slot GetSlot(int id);
         Slot GetSlot(ItemName itemName);
+        Slot GetSlot(Predicate<Slot> match);
     }
 
     public interface IInventoryCheck
@@ -24,6 +25,9 @@ namespace InventorySystem
         ItemReduceResult CanReduceItem(ItemName itemName, int count);
         MoveItemResult CanMoveItemTo(ItemName itemName, int slotId);
         SwapItemResult CanSwapItems(ItemName itemName, int slotId);
+        bool HasItem(ItemName name);
+        bool HasFreeSlot();
+        bool HasSlot(Func<Slot, bool> predicate);
     }
 
     public interface IInventoryInfo
@@ -185,6 +189,11 @@ namespace InventorySystem
             return Slots.Find(x => x.IsFree == false && x.Item.Name == itemName);
         }
 
+        public Slot GetSlot(Predicate<Slot> match)
+        {
+            return Slots.Find(match);
+        }
+
         public void DebugItems()
         {
             var data = "Inventory:\n";
@@ -249,7 +258,12 @@ namespace InventorySystem
 
             return SwapItemResult.Success;
         }
-        
+
+        public bool HasSlot(Func<Slot, bool> predicate)
+        {
+            return Slots.Any(predicate);
+        }
+
         private MoveItemResult SwapItemToOccupied(ItemName itemName, int slotId)
         {
             var result = SwapItems(itemName, slotId);
@@ -315,5 +329,11 @@ namespace InventorySystem
         CurrentSlotMatchesSelected, // Indicates that the current slot matches the selected slot
         SelectedSlotTagMismatch,    // Indicates that the selected slot doesn't match required tags
         CurrentSlotTagMismatch,      // Indicates that the current slot doesn't match required tags
+    }
+
+    public enum EquipItemResult
+    {
+        None,                       // No issues
+        Success,                    // Indicates success
     }
 }

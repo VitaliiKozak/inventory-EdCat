@@ -37,7 +37,14 @@ namespace UI
         {
             if(dragged.IsDragProcess == false) return;
             Debug.LogError($"Drop Item from Cell = {dragged.name} To {cell.name}");
-            _inventoryManagement.MoveItem(dragged.SlotInfo, cell.SlotInfo);
+            if (cell.SlotInfo.InventoryType == InventoryType.Equipment)
+            {
+                _inventoryManagement.EquipItem(dragged.SlotInfo, cell.SlotInfo);
+            }
+            else
+            {
+                _inventoryManagement.MoveItem(dragged.SlotInfo, cell.SlotInfo);
+            }
         }
 
         private void EndDragCallback(Cell cell)

@@ -69,6 +69,65 @@ namespace InventorySystem
             }
         }
 
+        public EquipItemResult EquipItem(ISlotInfo from, ISlotInfo to)
+        {
+            if (from.IsFree == true) return EquipItemResult.None;
+            if (from.IsAvailable == false) return EquipItemResult.None;
+            if (to.IsAvailable == false) return EquipItemResult.None;
+
+            if((to.Tags & from.Item.SlotsData) == SlotTag.Nothing) return EquipItemResult.None;
+            
+            var toController = GetController(to.InventoryType);
+            var fromController = GetController(from.InventoryType);
+            
+            if (to.IsFree == true)
+            {
+                //just equip
+                toController.GetSlot(to.Id).SetItem(from.Item,1);
+                fromController.GetSlot(from.Id).Reduce(1);
+                
+                return EquipItemResult.Success;
+            }
+            else
+            {
+                if (fromController.HasSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing) == false)
+                {
+                    if (from.Count == 1)
+                    {
+                        if ((from.Tags & to.Item.SlotsData) != SlotTag.Nothing)
+                        {
+                            //put where we take
+
+                            var fromData = from.Item;
+                            var fromCount = from.Count;
+                            var fromSlot = fromController.GetSlot(from.Id);
+                            fromSlot.SetItem(to.Item, to.Count);
+                            var toSlot = toController.GetSlot(to.Id);
+                            
+                            toSlot.SetItem(fromData, fromCount);
+                            return EquipItemResult.Success;
+                        }
+                        else
+                        {
+                            return EquipItemResult.None;
+                        }
+                    }
+                    else
+                    {
+                        return EquipItemResult.None;
+                    }
+                }
+                
+               var slot = fromController.GetSlot(x => x.IsAvailable == true && x.IsFree == true && (x.Tags & to.Item.SlotsData) != SlotTag.Nothing);
+               
+               slot.SetItem(to.Item, to.Count);
+               toController.GetSlot(to.Id).SetItem(from.Item,1);
+               fromController.ReduceItem(from.Item.Name, 1);
+               
+               return EquipItemResult.Success;
+            }
+        }
+
         public SwapItemResult SwapItem(ISlotInfo from, ISlotInfo to)
         {
             if (from.InventoryType == to.InventoryType)

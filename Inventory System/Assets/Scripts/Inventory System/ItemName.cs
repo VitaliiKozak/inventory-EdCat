@@ -44,5 +44,8 @@ namespace InventorySystem
         Backpack_3lvl,
         Tomato,
         Potato,
+        Weapon_TypeA,
+        Weapon_TypeB,
+        
     }
 }

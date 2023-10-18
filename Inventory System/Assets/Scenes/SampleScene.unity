@@ -1049,6 +1049,14 @@ MonoBehaviour:
     <AffectDataList>k__BackingField:
     - <Affect>k__BackingField: 6
       <Value>k__BackingField: 18
+  - <Name>k__BackingField: 8
+    <SlotsData>k__BackingField: 80
+    <TagData>k__BackingField: 0
+    <AffectDataList>k__BackingField: []
+  - <Name>k__BackingField: 9
+    <SlotsData>k__BackingField: 80
+    <TagData>k__BackingField: 0
+    <AffectDataList>k__BackingField: []
   _defaulteData:
     <Name>k__BackingField: 0
     <SlotsData>k__BackingField: 64

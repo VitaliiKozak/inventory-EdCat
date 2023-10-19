@@ -23,7 +23,7 @@ namespace InventorySystem
 
         public Inventory GetController(InventoryType type)
         {
-            if(_inventoryControllers.ContainsKey(type) == false) return null;
+            if (_inventoryControllers.ContainsKey(type) == false) throw new Exception($"Not registred inventory with type = {type} ");
             return _inventoryControllers[type];
         }
 
@@ -64,7 +64,7 @@ namespace InventorySystem
                     if (moveItem == true) toController.MoveItemTo(itemName, to.Id);
                     return MoveItemResult.Success;
                 }
-            }
+            }  
             return MoveItemResult.None;
         }
 

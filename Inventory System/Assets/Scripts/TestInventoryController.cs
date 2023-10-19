@@ -72,4 +72,10 @@ public class TestInventoryController : MonoBehaviour
     InventoryManagement.AddInventory(EquipmentInventory);
     EquipmentView?.TestInit(EquipmentInventory);
   }
+
+  [ContextMenu("Test Sort")]
+  private void TestSort()
+  {
+    PlayerInventory.Sort();
+  }
 }

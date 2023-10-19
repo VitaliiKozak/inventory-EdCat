@@ -8,7 +8,9 @@ namespace InventorySystem
 {
     public interface IInventory
     {
-        public void Init();
+        void Init();
+        void Sort();
+        
         ItemAddResult AddItem(ItemName itemName, int count);
         ItemReduceResult ReduceItem(ItemName itemName, int count);
         MoveItemResult MoveItemTo(ItemName itemName, int slotId);
@@ -88,6 +90,27 @@ namespace InventorySystem
             }
             _capacityProvider.OnCapacityChangeEvent.AddListener(ChangeCapacityCallback);
             ChangeCapacityCallback(_capacityProvider.GetCapacity());
+        }
+
+        public void Sort()
+        {
+            var makeChanges = false;
+            do
+            {
+                makeChanges = false;
+                for (int i = Slots.Count-1; i >= 0; i--)
+                {
+                    if(Slots[i].IsFree == true) continue;
+
+                    var slotFree = GetSlot(x => x.IsFree == true && (x.Tags & Slots[i].Item.SlotsData) != SlotTag.Nothing);
+                    if(slotFree == null || slotFree.Id > Slots[i].Id) continue;
+               
+                    slotFree.SetItem(Slots[i].Item, Slots[i].Count);
+                    Slots[i].Reduce(Slots[i].Count);
+                    makeChanges = true;
+                }
+                
+            } while (makeChanges);
         }
 
         public bool HasItem(ItemName name)

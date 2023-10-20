@@ -102,7 +102,7 @@ namespace InventorySystem
                 {
                     if(Slots[i].IsFree == true) continue;
 
-                    var slotFree = GetSlot(x => x.IsFree == true && (x.Tags & Slots[i].Item.SlotsData) != SlotTag.Nothing);
+                    var slotFree = GetSlot(x => x.IsFree == true&& x.IsAvailable == true && (x.Tags & Slots[i].Item.SlotsData) != SlotTag.Nothing);
                     if(slotFree == null || slotFree.Id > Slots[i].Id) continue;
                
                     slotFree.SetItem(Slots[i].Item, Slots[i].Count);

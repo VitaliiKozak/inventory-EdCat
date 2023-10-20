@@ -78,4 +78,20 @@ public class TestInventoryController : MonoBehaviour
   {
     PlayerInventory.Sort();
   }
+  
+  [ContextMenu("Test Invalid")]
+  private void TestInvalid()
+  {
+   var slots = PlayerInventory.GetInvalidSlots();
+
+   var result = $"Check Invalid = {slots.Count}";
+
+   foreach (var slot in slots)
+   {
+     result += $"Slot: {slot.Id} "; 
+   }
+   
+   Debug.LogError(result);
+  }
+ 
 }

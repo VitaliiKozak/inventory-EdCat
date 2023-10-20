@@ -1,60 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
 namespace InventorySystem
 {
-    public interface IInventory
-    {
-        void Init();
-        void Sort();
-        
-        ItemAddResult AddItem(ItemName itemName, int count);
-        ItemReduceResult ReduceItem(ItemName itemName, int count);
-        MoveItemResult MoveItemTo(ItemName itemName, int slotId);
-        SwapItemResult SwapItems(ItemName itemName, int slotId);
 
-        Slot GetSlot(int id);
-        Slot GetSlot(ItemName itemName);
-        Slot GetSlot(Predicate<Slot> match);
-    }
-
-    public interface IInventoryCheck
-    {
-        ItemAddResult CanAddItem(ItemName itemName, int count);
-        ItemReduceResult CanReduceItem(ItemName itemName, int count);
-        MoveItemResult CanMoveItemTo(ItemName itemName, int slotId);
-        SwapItemResult CanSwapItems(ItemName itemName, int slotId);
-        bool HasItem(ItemName name);
-        bool HasFreeSlot();
-        bool HasSlot(Func<Slot, bool> predicate);
-    }
-
-    public interface IInventoryInfo
-    {
-        InventoryType Type { get; }
-        int GetItemCount();
-    }
-    
-    public enum InventoryType
-    {
-        None,
-        Player,
-        Stock,
-        Equipment,
-    }
-    
-    [System.Serializable]
-    public struct SlotInitData
-    {
-        public int AditionalIndex;
-        public int Count;
-        public SlotTag Tags;
-    }
-
-    [System.Serializable]
+    [Serializable]
     public class Inventory : IInventory, IInventoryCheck, IInventoryInfo
     {
         public InventoryType Type => _inventoryDescriptor.Type;
@@ -95,22 +47,45 @@ namespace InventorySystem
         public void Sort()
         {
             var makeChanges = false;
+            //repeating the sorting until there is no passage without changes
             do
             {
                 makeChanges = false;
+                // Iterate through the Slots in reverse order
                 for (int i = Slots.Count-1; i >= 0; i--)
                 {
+                    // Check if the current slot is free; if it's free, skip to the next iteration
                     if(Slots[i].IsFree == true) continue;
-
+                    // Find a suitable slot that is free, available, and compatible with the item in the current slot
                     var slotFree = GetSlot(x => x.IsFree == true&& x.IsAvailable == true && (x.Tags & Slots[i].Item.SlotsData) != SlotTag.Nothing);
+                    // If no suitable slot is found or the found slot has a higher ID, skip to the next iteration
                     if(slotFree == null || slotFree.Id > Slots[i].Id) continue;
-               
+                    // Set the item in the found slot and reduce the count in the current slot
                     slotFree.SetItem(Slots[i].Item, Slots[i].Count);
                     Slots[i].Reduce(Slots[i].Count);
+                    // Mark that changes have been made during this pass
                     makeChanges = true;
                 }
-                
             } while (makeChanges);
+        }
+
+        public List<Slot> GetInvalidSlots()
+        {
+            var invalidSlots = new List<Slot>();
+
+            foreach (var slot in Slots)
+            {
+                if(slot.IsFree == true) continue;
+                
+                if (slot.IsAvailable == false ||
+                    (slot.Item.SlotsData & slot.Tags) == SlotTag.Nothing||
+                    slot.Count <= 0)
+                {
+                    invalidSlots.Add(slot);
+                }
+            }
+            
+            return invalidSlots;
         }
 
         public bool HasItem(ItemName name)
@@ -311,58 +286,5 @@ namespace InventorySystem
         {
             return Slots.FindAll(x => x.IsFree == false && x.IsAvailable == true).Count;
         }
-    }
-
-    public enum ItemAddResult
-    {
-        None,                         // No issues
-        AbsenceOfEmptySlots,          // Indicates the absence of empty slots
-        AbsenceOfSlotsWithSuitableTag,// Indicates the absence of slots with a suitable tag
-        Success,                      // Indicates success
-    }
-
-    public enum ItemReduceResult
-    {
-        None,                   // No issues
-        Success,                // Indicates success
-        AbsenceOfItem,          // Indicates the absence of the item
-        InsufficientQuantity,   // Indicates insufficient quantity of the item
-    }
-
-    public enum MoveItemResult
-    {
-        None,                       // No issues
-        Success,                    // Indicates success
-        NoSuchItem,                 // Indicates that there is no such item
-        NoSelectedSlot,             // Indicates that no slot is selected
-        SelectedSlotNotAvailable,   // Indicates that the selected slot is not available
-        SelectedSlotOccupied,       // Indicates that the selected slot is already occupied
-        CurrentSlotMatchesSelected, // Indicates that the current slot matches the selected slot
-        SelectedSlotMissingTag,     // Indicates that the selected slot doesn't have the required tag
-    }
-
-    public enum SwapItemResult
-    {
-        None,                       // No issues
-        Success,                    // Indicates success
-        NoSuchItem,                 // Indicates that there is no such item
-        NoSelectedSlot,             // Indicates that no slot is selected
-        SelectedSlotNotAvailable,   // Indicates that the selected slot is not available
-        SelectedSlotEmpty,          // Indicates that the selected slot is empty
-        CurrentSlotMatchesSelected, // Indicates that the current slot matches the selected slot
-        SelectedSlotTagMismatch,    // Indicates that the selected slot doesn't match required tags
-        CurrentSlotTagMismatch,      // Indicates that the current slot doesn't match required tags
-    }
-
-    public enum EquipItemResult
-    {
-        None,                       // No issues
-        Success,                    // Indicates success
-        CurrentSlotEmpty = 2,                // Indicates that the current slot is empty
-        CurrentSlotNotAvailable = 3,        // Indicates that the current slot is not available
-        SelectedSlotNotAvailable = 4,       // Indicates that the selected slot is not available
-        SelectedSlotTagMismatch = 5,        // Indicates that the selected slot doesn't match required tags
-        ItemsAreSame = 6,                   // Indicates that the selected and current items are the same
-        InventoryFull = 7                   // Indicates that the inventory is full
     }
 }

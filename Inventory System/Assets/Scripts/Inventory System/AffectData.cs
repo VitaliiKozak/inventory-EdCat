@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 namespace InventorySystem
 {
+    //not move in file with enums, because this from project EdCat
     public enum AffectType
     {
         Satiety,
